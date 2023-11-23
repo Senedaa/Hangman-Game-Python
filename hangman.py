@@ -36,15 +36,12 @@ def isWordGuessed(secretWord, lettersGuessed):
     returns: boolean, True if all the letters of secretWord are in lettersGuessed;
       False otherwise
     '''
-    x = 0
-    if lettersGuessed != secretWord:
-      return False
-    else:
-      print("________________")
-      print("Conguratulation, you won")
-      return True
+    for letter in secretWord:
+        if letter not in lettersGuessed:
+            return False
+    return True
 
-def getGuessedWord(secretWord, lettersGuessed,guessedLettersThisTurn):
+def getGuessedWord(secretWord, lettersGuessed):
     '''
     secretWord: string, the word the user is guessing
     lettersGuessed: list, what letters have been guessed so far
@@ -58,13 +55,6 @@ def getGuessedWord(secretWord, lettersGuessed,guessedLettersThisTurn):
             string += ' _ '
         else:
             string += i
-            if i in guessedLettersThisTurn:
-                x = 1
-            
-    if x == 1:
-        print("Good Guess: ", string)
-    else:
-        print("Oops!,That letter is not in my word:", string)
     return string
 
 
@@ -83,18 +73,16 @@ def getAvailableLetters(lettersGuessed):
     
 
 def hangman(secretWord):
-    '''
-    This program starts an interactive hangman game.
-    '''
-    # lettersGuessed = ''
     guessedLetters = ''
-    won =False
+    won = False
+    guessesLeft = 8
 
     print("Welcome to the game, Hangman!")
-    print("I am thinking of a word that is " + str(len(secretWord)) + " long.")
+    print("I am thinking of a word that is " + str(len(secretWord)) + " letters long.")
     print("__________________")
-    for i in range(8, 0, -1):
-        print(f'You have {i} guesses left')
+
+    while guessesLeft > 0:
+        print(f'You have {guessesLeft} guesses left')
         availableLetters = getAvailableLetters(guessedLetters)
         print("Available letters:", ' '.join(availableLetters))
         
@@ -106,18 +94,27 @@ def hangman(secretWord):
                 print("Oops! You have guessed that letter already.")
             elif inputLetter not in availableLetters:
                 print("Oops! You have guessed an invalid letter.")
+            elif inputLetter in secretWord and inputLetter not in guessedLetters:
+                guessedLetters += inputLetter
+                print(f'Good Guess: {getGuessedWord(secretWord, guessedLetters)}')
+                break
             else:
                 guessedLettersThisTurn = inputLetter
                 guessedLetters += inputLetter
+                guessesLeft -= 1
+                print(f'Oops!,That letter is not in my word: {getGuessedWord(secretWord, guessedLetters)}')
                 break
 
-        lettersCompleted = getGuessedWord(secretWord,guessedLetters,guessedLettersThisTurn)
+        lettersCompleted = getGuessedWord(secretWord, guessedLetters)
 
         if isWordGuessed(secretWord, lettersCompleted):
             won = True
             break
-    if not won:
-        print("Sorry you lost the game, The answer was : ", secretWord)
-    
+
+    if won:
+        print("Congratulations, you won!")
+    else:
+        print("Sorry, you lost the game. The answer was:", secretWord)
+
 secretWord = chooseWord(wordlist).lower()
 hangman(secretWord)
